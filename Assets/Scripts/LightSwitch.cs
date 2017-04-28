@@ -6,6 +6,8 @@ public class LightSwitch : MonoBehaviour {
 
 	public bool SwitchOn = false;	// Current state of switch
 	public GameObject[] Lights;		// Array of light objects
+	public bool useEmissiveMaterials = false;
+	public int defaultEmissiveMaterial;
 
 	// Move switch to right position
 	void Start() {
@@ -38,7 +40,18 @@ public class LightSwitch : MonoBehaviour {
 	// Go thru light objects and toggle light
 	void SetLights() {
 		foreach(GameObject light in Lights) {
-			light.GetComponent<Light> ().enabled = !light.GetComponent<Light> ().enabled;
+			Light[] lightsInGO = light.GetComponentsInChildren<Light> ();
+			foreach (Light lightComponent in lightsInGO) {
+				lightComponent.enabled = !lightComponent.enabled;
+			}
+
+			if (useEmissiveMaterials) {
+				Material[] MaterialsInGO = light.GetComponent<MeshRenderer> ().materials;
+				if (MaterialsInGO [defaultEmissiveMaterial].IsKeywordEnabled("_EMISSION"))
+					MaterialsInGO [defaultEmissiveMaterial].DisableKeyword ("_EMISSION");
+				else 
+					MaterialsInGO [defaultEmissiveMaterial].EnableKeyword ("_EMISSION");
+			}
 		}
 	}
 
